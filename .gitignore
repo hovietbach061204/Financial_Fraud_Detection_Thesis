@@ -1,0 +1,6 @@
+# Data / serialized artifacts
+*.csv
+*.pkl
+*.pickle
+
+.claude/*
