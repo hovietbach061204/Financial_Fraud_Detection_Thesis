@@ -1,0 +1,213 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 1380" font-family="-apple-system, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2c3e50"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2980b9"/>
+    </marker>
+    <linearGradient id="lstmGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a8d5ff"/>
+      <stop offset="100%" stop-color="#5a9fdf"/>
+    </linearGradient>
+    <linearGradient id="denseGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffd8a8"/>
+      <stop offset="100%" stop-color="#e89c4a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Title -->
+  <text x="550" y="35" text-anchor="middle" font-size="22" font-weight="700" fill="#1a1a1a">FraudLSTM — Data Flow Through the Network</text>
+  <text x="550" y="58" text-anchor="middle" font-size="13" fill="#555">batch=512 · window=5 · features=234 · hidden=128 · layers=2 · dropout=0.3</text>
+
+  <!-- ===== INPUT BLOCK ===== -->
+  <rect x="80" y="90" width="940" height="120" rx="10" fill="#f4f7fb" stroke="#7ca7d4" stroke-width="1.5"/>
+  <text x="100" y="115" font-size="15" font-weight="700" fill="#2c3e50">1.  Input batch  xb : (B=512, T=5, F=234)</text>
+  <text x="100" y="135" font-size="12" fill="#444">Last 5 transactions per UID, each a 234-dim standardized feature vector (clipped to [-5, 5]).</text>
+
+  <!-- 5 timesteps as cells -->
+  <g transform="translate(120,150)">
+    <g>
+      <rect x="0"   y="0" width="140" height="40" rx="6" fill="#fff" stroke="#7ca7d4"/>
+      <text x="70"  y="18" text-anchor="middle" font-size="12" font-weight="600">t = 0</text>
+      <text x="70"  y="33" text-anchor="middle" font-size="11" fill="#555">x_0 ∈ ℝ²³⁴</text>
+
+      <rect x="155" y="0" width="140" height="40" rx="6" fill="#fff" stroke="#7ca7d4"/>
+      <text x="225" y="18" text-anchor="middle" font-size="12" font-weight="600">t = 1</text>
+      <text x="225" y="33" text-anchor="middle" font-size="11" fill="#555">x_1 ∈ ℝ²³⁴</text>
+
+      <rect x="310" y="0" width="140" height="40" rx="6" fill="#fff" stroke="#7ca7d4"/>
+      <text x="380" y="18" text-anchor="middle" font-size="12" font-weight="600">t = 2</text>
+      <text x="380" y="33" text-anchor="middle" font-size="11" fill="#555">x_2 ∈ ℝ²³⁴</text>
+
+      <rect x="465" y="0" width="140" height="40" rx="6" fill="#fff" stroke="#7ca7d4"/>
+      <text x="535" y="18" text-anchor="middle" font-size="12" font-weight="600">t = 3</text>
+      <text x="535" y="33" text-anchor="middle" font-size="11" fill="#555">x_3 ∈ ℝ²³⁴</text>
+
+      <rect x="620" y="0" width="140" height="40" rx="6" fill="#fff8e7" stroke="#e89c4a" stroke-width="2"/>
+      <text x="690" y="18" text-anchor="middle" font-size="12" font-weight="700">t = 4 (last)</text>
+      <text x="690" y="33" text-anchor="middle" font-size="11" fill="#555">x_4 ∈ ℝ²³⁴</text>
+    </g>
+  </g>
+
+  <!-- arrow down -->
+  <line x1="550" y1="220" x2="550" y2="245" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- ===== INIT_HIDDEN ===== -->
+  <rect x="780" y="240" width="240" height="80" rx="10" fill="#fdf3f3" stroke="#d36a6a" stroke-width="1.5"/>
+  <text x="900" y="262" text-anchor="middle" font-size="14" font-weight="700" fill="#7d2e2e">init_hidden(B, device)</text>
+  <text x="900" y="282" text-anchor="middle" font-size="11" fill="#444">h0 : (2, 512, 128)  zeros</text>
+  <text x="900" y="298" text-anchor="middle" font-size="11" fill="#444">c0 : (2, 512, 128)  zeros</text>
+  <text x="900" y="314" text-anchor="middle" font-size="10" fill="#777">called once per mini-batch</text>
+
+  <!-- arrow into LSTM -->
+  <path d="M 780 280 Q 700 280 700 340" stroke="#d36a6a" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- ===== LSTM BLOCK ===== -->
+  <rect x="80" y="250" width="640" height="220" rx="12" fill="url(#lstmGrad)" stroke="#2c3e50" stroke-width="1.5"/>
+  <text x="100" y="278" font-size="15" font-weight="700" fill="#1a1a1a">2.  nn.LSTM(input=234, hidden=128, num_layers=2, batch_first=True, dropout=0.3)</text>
+
+  <!-- Layer 2 row -->
+  <text x="100" y="310" font-size="12" font-weight="600" fill="#1a1a1a">Layer 2</text>
+  <g transform="translate(160,295)">
+    <rect x="0"   y="0" width="90" height="32" rx="5" fill="#ffffff" stroke="#1a4a7a"/><text x="45" y="20" text-anchor="middle" font-size="11">cell² (t=0)</text>
+    <rect x="105" y="0" width="90" height="32" rx="5" fill="#ffffff" stroke="#1a4a7a"/><text x="150" y="20" text-anchor="middle" font-size="11">cell² (t=1)</text>
+    <rect x="210" y="0" width="90" height="32" rx="5" fill="#ffffff" stroke="#1a4a7a"/><text x="255" y="20" text-anchor="middle" font-size="11">cell² (t=2)</text>
+    <rect x="315" y="0" width="90" height="32" rx="5" fill="#ffffff" stroke="#1a4a7a"/><text x="360" y="20" text-anchor="middle" font-size="11">cell² (t=3)</text>
+    <rect x="420" y="0" width="90" height="32" rx="5" fill="#fff8e7" stroke="#e89c4a" stroke-width="2"/><text x="465" y="20" text-anchor="middle" font-size="11" font-weight="700">cell² (t=4)</text>
+
+    <line x1="90"  y1="16" x2="105" y2="16" stroke="#1a4a7a" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+    <line x1="195" y1="16" x2="210" y2="16" stroke="#1a4a7a" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+    <line x1="300" y1="16" x2="315" y2="16" stroke="#1a4a7a" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+    <line x1="405" y1="16" x2="420" y2="16" stroke="#1a4a7a" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  </g>
+
+  <!-- between-layer dropout label -->
+  <text x="400" y="357" text-anchor="middle" font-size="10" fill="#7d2e2e" font-style="italic">↑ Dropout(0.3) is applied here, BETWEEN layer 1 and layer 2 ↑</text>
+
+  <!-- Layer 1 row -->
+  <text x="100" y="385" font-size="12" font-weight="600" fill="#1a1a1a">Layer 1</text>
+  <g transform="translate(160,370)">
+    <rect x="0"   y="0" width="90" height="32" rx="5" fill="#ffffff" stroke="#1a4a7a"/><text x="45" y="20" text-anchor="middle" font-size="11">cell¹ (t=0)</text>
+    <rect x="105" y="0" width="90" height="32" rx="5" fill="#ffffff" stroke="#1a4a7a"/><text x="150" y="20" text-anchor="middle" font-size="11">cell¹ (t=1)</text>
+    <rect x="210" y="0" width="90" height="32" rx="5" fill="#ffffff" stroke="#1a4a7a"/><text x="255" y="20" text-anchor="middle" font-size="11">cell¹ (t=2)</text>
+    <rect x="315" y="0" width="90" height="32" rx="5" fill="#ffffff" stroke="#1a4a7a"/><text x="360" y="20" text-anchor="middle" font-size="11">cell¹ (t=3)</text>
+    <rect x="420" y="0" width="90" height="32" rx="5" fill="#ffffff" stroke="#1a4a7a"/><text x="465" y="20" text-anchor="middle" font-size="11">cell¹ (t=4)</text>
+
+    <line x1="90"  y1="16" x2="105" y2="16" stroke="#1a4a7a" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+    <line x1="195" y1="16" x2="210" y2="16" stroke="#1a4a7a" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+    <line x1="300" y1="16" x2="315" y2="16" stroke="#1a4a7a" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+    <line x1="405" y1="16" x2="420" y2="16" stroke="#1a4a7a" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  </g>
+
+  <!-- vertical arrows from layer1 to layer2 -->
+  <line x1="205" y1="370" x2="205" y2="327" stroke="#1a4a7a" stroke-width="1" marker-end="url(#arrow-blue)"/>
+  <line x1="310" y1="370" x2="310" y2="327" stroke="#1a4a7a" stroke-width="1" marker-end="url(#arrow-blue)"/>
+  <line x1="415" y1="370" x2="415" y2="327" stroke="#1a4a7a" stroke-width="1" marker-end="url(#arrow-blue)"/>
+  <line x1="520" y1="370" x2="520" y2="327" stroke="#1a4a7a" stroke-width="1" marker-end="url(#arrow-blue)"/>
+  <line x1="625" y1="370" x2="625" y2="327" stroke="#1a4a7a" stroke-width="1" marker-end="url(#arrow-blue)"/>
+
+  <!-- input arrows from x_t into layer1 -->
+  <line x1="190" y1="220" x2="205" y2="370" stroke="#7ca7d4" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="345" y1="220" x2="310" y2="370" stroke="#7ca7d4" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="500" y1="220" x2="415" y2="370" stroke="#7ca7d4" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="655" y1="220" x2="520" y2="370" stroke="#7ca7d4" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="810" y1="220" x2="625" y2="370" stroke="#7ca7d4" stroke-width="1" stroke-dasharray="3,2"/>
+
+  <text x="100" y="430" font-size="12" fill="#1a1a1a">Output of LSTM:</text>
+  <text x="240" y="430" font-size="12" font-weight="600" fill="#1a4a7a">lstm_out : (B, T, 128) = (512, 5, 128)</text>
+  <text x="240" y="448" font-size="11" fill="#444">— hidden state of TOP layer at every timestep</text>
+  <text x="100" y="463" font-size="12" font-weight="600" fill="#1a4a7a">h_n, c_n : (2, 512, 128)  — final hidden/cell of BOTH layers</text>
+
+  <!-- arrow down -->
+  <line x1="465" y1="475" x2="465" y2="500" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="500" y="495" font-size="11" fill="#555" font-style="italic">take last timestep →</text>
+
+  <!-- ===== POOL: lstm_out[:, -1, :] ===== -->
+  <rect x="320" y="505" width="290" height="60" rx="8" fill="#fff8e7" stroke="#e89c4a" stroke-width="1.5"/>
+  <text x="465" y="528" text-anchor="middle" font-size="14" font-weight="700" fill="#7d4a1a">3.  last = lstm_out[:, -1, :]</text>
+  <text x="465" y="548" text-anchor="middle" font-size="12" fill="#333">shape: (B, 128) = (512, 128)</text>
+
+  <line x1="465" y1="565" x2="465" y2="590" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- ===== Dropout 1 ===== -->
+  <rect x="320" y="595" width="290" height="50" rx="8" fill="#fdf3f3" stroke="#d36a6a"/>
+  <text x="465" y="618" text-anchor="middle" font-size="13" font-weight="700" fill="#7d2e2e">4.  Dropout(p = 0.3)</text>
+  <text x="465" y="635" text-anchor="middle" font-size="11" fill="#555">(512, 128) — train mode only; no-op in eval</text>
+
+  <line x1="465" y1="645" x2="465" y2="670" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- ===== fc1 ===== -->
+  <rect x="280" y="675" width="370" height="55" rx="8" fill="url(#denseGrad)" stroke="#2c3e50"/>
+  <text x="465" y="698" text-anchor="middle" font-size="14" font-weight="700">5.  fc1 = nn.Linear(128 → 32)</text>
+  <text x="465" y="717" text-anchor="middle" font-size="12">out = last @ W₁ᵀ + b₁    →    (512, 32)</text>
+
+  <line x1="465" y1="730" x2="465" y2="755" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- ===== ReLU ===== -->
+  <rect x="320" y="760" width="290" height="50" rx="8" fill="#eaf6ec" stroke="#5fa66c"/>
+  <text x="465" y="783" text-anchor="middle" font-size="13" font-weight="700" fill="#1f5d2c">6.  ReLU — max(0, ·)</text>
+  <text x="465" y="800" text-anchor="middle" font-size="11" fill="#555">(512, 32) — adds non-linearity between fc1 and fc2</text>
+
+  <line x1="465" y1="810" x2="465" y2="835" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- ===== Dropout 2 ===== -->
+  <rect x="320" y="840" width="290" height="50" rx="8" fill="#fdf3f3" stroke="#d36a6a"/>
+  <text x="465" y="863" text-anchor="middle" font-size="13" font-weight="700" fill="#7d2e2e">7.  Dropout(p = 0.3)</text>
+  <text x="465" y="880" text-anchor="middle" font-size="11" fill="#555">(512, 32)</text>
+
+  <line x1="465" y1="890" x2="465" y2="915" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- ===== fc2 ===== -->
+  <rect x="280" y="920" width="370" height="55" rx="8" fill="url(#denseGrad)" stroke="#2c3e50"/>
+  <text x="465" y="943" text-anchor="middle" font-size="14" font-weight="700">8.  fc2 = nn.Linear(32 → 1)</text>
+  <text x="465" y="962" text-anchor="middle" font-size="12">→ (512, 1) → squeeze(-1) → logits : (512,)</text>
+
+  <line x1="465" y1="975" x2="465" y2="1000" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- ===== Two paths ===== -->
+  <rect x="80"  y="1005" width="380" height="120" rx="10" fill="#f0e6f5" stroke="#8e44ad"/>
+  <text x="270" y="1028" text-anchor="middle" font-size="14" font-weight="700" fill="#5d2d7a">9a. TRAINING path</text>
+  <text x="270" y="1052" text-anchor="middle" font-size="12" fill="#333">loss = BCEWithLogitsLoss(pos_weight)(logits, yb)</text>
+  <text x="270" y="1070" text-anchor="middle" font-size="11" fill="#555">pos_weight = √(neg / pos) — handles class imbalance</text>
+  <text x="270" y="1090" text-anchor="middle" font-size="11" fill="#555">loss.backward()  →  clip_grad_norm_  →  optimizer.step()</text>
+  <text x="270" y="1108" text-anchor="middle" font-size="11" fill="#777" font-style="italic">sigmoid is fused INSIDE the loss for numerical stability</text>
+
+  <rect x="490" y="1005" width="380" height="120" rx="10" fill="#e6f5f0" stroke="#16a085"/>
+  <text x="680" y="1028" text-anchor="middle" font-size="14" font-weight="700" fill="#0e6a55">9b. EVALUATION path</text>
+  <text x="680" y="1052" text-anchor="middle" font-size="12" fill="#333">probs = torch.sigmoid(logits)</text>
+  <text x="680" y="1070" text-anchor="middle" font-size="11" fill="#555">→ stored in oof[idxV] as fraud probabilities ∈ [0, 1]</text>
+  <text x="680" y="1090" text-anchor="middle" font-size="11" fill="#555">fold_auc = roc_auc_score(y_val, probs)</text>
+  <text x="680" y="1110" text-anchor="middle" font-size="11" fill="#0e6a55" font-weight="700">your reported OOF AUC = 0.8898</text>
+
+  <!-- Arrows to two paths -->
+  <line x1="465" y1="1000" x2="270" y2="1005" stroke="#8e44ad" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="465" y1="1000" x2="680" y2="1005" stroke="#16a085" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ===== LSTM CELL DETAIL ===== -->
+  <rect x="80" y="1150" width="940" height="220" rx="10" fill="#fafbfc" stroke="#bdc3c7" stroke-width="1.5"/>
+  <text x="100" y="1175" font-size="14" font-weight="700" fill="#2c3e50">Inside ONE LSTM cell at timestep t  (gates of layer ℓ)</text>
+
+  <g transform="translate(110,1190)">
+    <text x="0" y="20" font-size="12" fill="#1a1a1a" font-family="monospace">f_t  =  σ(W_f · [h_{t-1}, x_t] + b_f)</text>
+    <text x="0" y="40" font-size="12" fill="#1a1a1a" font-family="monospace">i_t  =  σ(W_i · [h_{t-1}, x_t] + b_i)</text>
+    <text x="0" y="60" font-size="12" fill="#1a1a1a" font-family="monospace">ĉ_t  =  tanh(W_c · [h_{t-1}, x_t] + b_c)</text>
+    <text x="0" y="80" font-size="12" fill="#1a1a1a" font-family="monospace">c_t  =  f_t ⊙ c_{t-1}  +  i_t ⊙ ĉ_t       ← cell-state highway</text>
+    <text x="0" y="100" font-size="12" fill="#1a1a1a" font-family="monospace">o_t  =  σ(W_o · [h_{t-1}, x_t] + b_o)</text>
+    <text x="0" y="120" font-size="12" fill="#1a1a1a" font-family="monospace">h_t  =  o_t ⊙ tanh(c_t)                    ← passed UP and to next step</text>
+    <text x="0" y="148" font-size="11" fill="#555" font-style="italic">σ = sigmoid · ⊙ = element-wise multiply · [a, b] = concatenation</text>
+    <text x="0" y="166" font-size="11" fill="#555">For your project: x_t ∈ ℝ²³⁴ at layer 1, x_t ∈ ℝ¹²⁸ at layer 2 (= h_t¹ from layer 1).</text>
+  </g>
+
+  <g transform="translate(640,1200)">
+    <rect x="0" y="0" width="340" height="155" rx="6" fill="#ffffff" stroke="#bdc3c7"/>
+    <text x="170" y="22" text-anchor="middle" font-size="12" font-weight="700">Gate intuition</text>
+    <text x="15" y="45"  font-size="11" fill="#333">Forget  (f) — "how much old memory to drop"</text>
+    <text x="15" y="65"  font-size="11" fill="#333">Input   (i) — "how strongly to write the new candidate"</text>
+    <text x="15" y="85"  font-size="11" fill="#333">Cand.   (ĉ) — "what the new content would be"</text>
+    <text x="15" y="105" font-size="11" fill="#333">Output  (o) — "how much of the cell to expose"</text>
+    <text x="15" y="130" font-size="11" fill="#555" font-style="italic">Gates are the reason LSTM doesn't suffer from the</text>
+    <text x="15" y="145" font-size="11" fill="#555" font-style="italic">vanishing-gradient problem of vanilla RNNs.</text>
+  </g>
+
+</svg>

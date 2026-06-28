@@ -4,3 +4,16 @@
 *.pickle
 
 .claude/*
+
+# Local thesis material and generated datasets
+/Bachelor_Thesis_Sample_Report/
+/documents/
+/data/
+/antifraud/
+/ieee-fraud-detection/csv_exported_files/
+/ieee-fraud-detection/csv_imported_file/
+/ieee-fraud-detection/parquet_exported_files/
+/ieee-fraud-detection/pkl_exported_files/
+/ieee-fraud-detection/sequence_cache_uid_disjoint/
+/ieee-fraud-detection/split_data_npy/
+/ieee-fraud-detection/split_data.npz
